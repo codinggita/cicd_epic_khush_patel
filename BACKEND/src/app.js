@@ -3,6 +3,8 @@ const cors = require('cors');
 const morgan = require('morgan');
 const workflowRoutes = require('./routes/workflowRoutes');
 const infraRoutes = require('./routes/infraRoutes');
+const authRoutes = require('./routes/authRoutes');
+const userRoutes = require('./routes/userRoutes');
 const errorHandler = require('./middlewares/errorHandler');
 
 const app = express();
@@ -31,6 +33,8 @@ app.get('/health', (req, res) => {
 // API Routes mounting
 app.use('/api/v1/workflows', workflowRoutes);
 app.use('/api/v1/infra', infraRoutes);
+app.use('/api/v1/auth', authRoutes);
+app.use('/api/v1/users', userRoutes);
 
 // Catch-all route handler for 404 Not Found
 app.use((req, res, next) => {

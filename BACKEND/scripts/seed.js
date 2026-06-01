@@ -4,6 +4,7 @@ const mongoose = require('mongoose');
 const Workflow = require('../src/models/workflow');
 const WorkflowVersion = require('../src/models/workflowVersion');
 const WorkflowRun = require('../src/models/workflowRun');
+const User = require('../src/models/user');
 
 // Ensure environment variables are loaded
 require('dotenv').config({ path: path.join(__dirname, '../.env') });
@@ -18,7 +19,8 @@ const seedDB = async () => {
     await Promise.all([
       Workflow.deleteMany({}),
       WorkflowVersion.deleteMany({}),
-      WorkflowRun.deleteMany({})
+      WorkflowRun.deleteMany({}),
+      User.deleteMany({})
     ]);
     console.log('Database cleared.');
 
@@ -71,6 +73,23 @@ const seedDB = async () => {
 
     await WorkflowVersion.insertMany(versionHistory);
     console.log('Successfully created initial version history logs.');
+
+    console.log('Seeding default users (admin and standard)...');
+    await User.create([
+      {
+        name: 'Admin User',
+        email: 'admin@cicd-epic.com',
+        password: 'admin123',
+        role: 'admin'
+      },
+      {
+        name: 'Standard User',
+        email: 'user@cicd-epic.com',
+        password: 'user123',
+        role: 'user'
+      }
+    ]);
+    console.log('Successfully seeded default users.');
 
     console.log('Seeding process completed successfully!');
     process.exit(0);

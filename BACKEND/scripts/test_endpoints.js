@@ -5,19 +5,25 @@ const app = require('../src/app');
 const PORT = 5001;
 let server;
 
-// Helper to make native HTTP requests to localhost:5001
-const request = (method, path, body = null) => {
+// Helper to make native HTTP requests to localhost:5001 with optional JWT token
+const request = (method, path, body = null, token = null) => {
   return new Promise((resolve, reject) => {
     const postData = body ? JSON.stringify(body) : '';
+    const headers = {
+      'Content-Type': 'application/json',
+      'Content-Length': Buffer.byteLength(postData)
+    };
+
+    if (token) {
+      headers['Authorization'] = `Bearer ${token}`;
+    }
+
     const options = {
       hostname: '127.0.0.1',
       port: PORT,
       path,
       method,
-      headers: {
-        'Content-Type': 'application/json',
-        'Content-Length': Buffer.byteLength(postData)
-      }
+      headers
     };
 
     const req = http.request(options, (res) => {
@@ -85,6 +91,13 @@ const executeTestCases = async () => {
   console.log('==================================================');
 
   let testWorkflowId;
+  let adminToken;
+  let userToken;
+  let testUserId;
+
+  // ==========================================
+  // PHASE 1: CORE WORKFLOW & INFRA TESTS
+  // ==========================================
 
   // Test Case 1: Health Check Endpoint
   const healthRes = await request('GET', '/health');
@@ -291,6 +304,88 @@ const executeTestCases = async () => {
   const networkingGuidesRes = await request('GET', '/api/v1/infra/networking?limit=1');
   assert(networkingGuidesRes.statusCode === 200, '/infra/networking should return 200');
   logSuccess('GET /infra/* routes (k8s, docker, aws, pods, networking verified)');
+
+  // ==========================================
+  // PHASE 2: AUTHENTICATION & USER CRUD TESTS
+  // ==========================================
+
+  // Auth Test 1: Login as seeded Admin
+  const adminLoginRes = await request('POST', '/api/v1/auth/login', {
+    email: 'admin@cicd-epic.com',
+    password: 'admin123'
+  });
+  assert(adminLoginRes.statusCode === 200, 'Admin login should succeed');
+  assert(adminLoginRes.body.token !== undefined, 'Admin login should return token');
+  assert(adminLoginRes.body.data.role === 'admin', 'Admin login user should have admin role');
+  adminToken = adminLoginRes.body.token;
+  logSuccess('Auth Login (Admin)');
+
+  // Auth Test 2: Login as seeded standard User
+  const userLoginRes = await request('POST', '/api/v1/auth/login', {
+    email: 'user@cicd-epic.com',
+    password: 'user123'
+  });
+  assert(userLoginRes.statusCode === 200, 'User login should succeed');
+  assert(userLoginRes.body.token !== undefined, 'User login should return token');
+  assert(userLoginRes.body.data.role === 'user', 'User login user should have user role');
+  userToken = userLoginRes.body.token;
+  logSuccess('Auth Login (Standard User)');
+
+  // Auth Test 3: GET /auth/profile (succeeds with token)
+  const profileRes = await request('GET', '/api/v1/auth/profile', null, userToken);
+  assert(profileRes.statusCode === 200, 'GET /profile with token should succeed');
+  assert(profileRes.body.data.email === 'user@cicd-epic.com', 'Profile details email should match');
+  logSuccess('Auth Get Profile (Protected)');
+
+  // Auth Test 4: GET /auth/profile (fails without token)
+  const noTokenRes = await request('GET', '/api/v1/auth/profile');
+  assert(noTokenRes.statusCode === 401, 'GET /profile without token should return 401 Unauthorized');
+  logSuccess('Auth Profile Block Without Token');
+
+  // Auth Test 5: PUT /auth/profile (updates name)
+  const updateProfileRes = await request('PUT', '/api/v1/auth/profile', {
+    name: 'Standard User Updated'
+  }, userToken);
+  assert(updateProfileRes.statusCode === 200, 'PUT /profile update should succeed');
+  assert(updateProfileRes.body.data.name === 'Standard User Updated', 'Profile name should be updated in response');
+  logSuccess('Auth Update Profile');
+
+  // Auth Test 6: GET /api/v1/users (Admin Only - fails with standard user token)
+  const listUsersUserRes = await request('GET', '/api/v1/users', null, userToken);
+  assert(listUsersUserRes.statusCode === 403, 'GET /users with standard user token should return 403 Forbidden');
+  logSuccess('User Role restrictionTo Guard');
+
+  // Auth Test 7: GET /api/v1/users (Admin Only - succeeds with admin token)
+  const listUsersAdminRes = await request('GET', '/api/v1/users', null, adminToken);
+  assert(listUsersAdminRes.statusCode === 200, 'GET /users with admin token should succeed');
+  assert(listUsersAdminRes.body.pagination.total >= 2, 'Should list seeded users');
+  logSuccess('Admin Access User List');
+
+  // Auth Test 8: Admin creates a new user via POST /api/v1/users
+  const createUserRes = await request('POST', '/api/v1/users', {
+    name: 'Temporary User',
+    email: 'temp@cicd-epic.com',
+    password: 'temp123password',
+    role: 'user'
+  }, adminToken);
+  assert(createUserRes.statusCode === 201, 'Admin user creation should return 201 Created');
+  testUserId = createUserRes.body.data._id;
+  logSuccess('Admin CRUD User Creation');
+
+  // Auth Test 9: Admin updates the user via PUT /api/v1/users/:id
+  const updateUserRes = await request('PUT', `/api/v1/users/${testUserId}`, {
+    role: 'admin',
+    name: 'Temporary User Promoted'
+  }, adminToken);
+  assert(updateUserRes.statusCode === 200, 'Admin user update should return 200');
+  assert(updateUserRes.body.data.role === 'admin', 'User role should be updated to admin');
+  assert(updateUserRes.body.data.name === 'Temporary User Promoted', 'User name should be updated');
+  logSuccess('Admin CRUD User Update');
+
+  // Auth Test 10: Admin deletes user via DELETE /api/v1/users/:id
+  const deleteUserRes = await request('DELETE', `/api/v1/users/${testUserId}`, null, adminToken);
+  assert(deleteUserRes.statusCode === 200, 'Admin user deletion should return 200');
+  logSuccess('Admin CRUD User Deletion');
 
   console.log('\n==================================================');
   console.log('     CONGRATULATIONS: ALL TESTS PASSED SUCCESSFULLY!    ');
