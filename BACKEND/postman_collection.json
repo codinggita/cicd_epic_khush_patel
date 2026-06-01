@@ -1,0 +1,1222 @@
+{
+  "info": {
+    "name": "CICD_Epic API Collection",
+    "description": "Postman collection for testing all 49 endpoints of the CICD_Epic Knowledge & Administration API.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://localhost:5000/api/v1",
+      "type": "string"
+    },
+    {
+      "key": "token",
+      "value": "your_jwt_token_here",
+      "type": "string"
+    },
+    {
+      "key": "workflow_id",
+      "value": "6a1d3e3b0715ea060538da26",
+      "type": "string"
+    },
+    {
+      "key": "user_id",
+      "value": "6a1d3e3b0715ea060538da30",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "1. Authentication Operations",
+      "description": "Endpoints for user sign up, login, profile retrieval, and updates.",
+      "item": [
+        {
+          "name": "User Signup",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"New Developer\",\n  \"email\": \"newdeveloper@cicd-epic.com\",\n  \"password\": \"devpassword123\",\n  \"role\": \"user\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/auth/signup",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "auth",
+                "signup"
+              ]
+            }
+          }
+        },
+        {
+          "name": "User Login",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"admin@cicd-epic.com\",\n  \"password\": \"admin123\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/auth/login",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "auth",
+                "login"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Profile",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/auth/profile",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "auth",
+                "profile"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Update Profile",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Admin User Updated\",\n  \"email\": \"admin@cicd-epic.com\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/auth/profile",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "auth",
+                "profile"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "2. Workflows CRUD & Operations",
+      "description": "Manage continuous integration templates, version logging, and run executions.",
+      "item": [
+        {
+          "name": "Get All Workflows (Paginated & Searchable)",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/workflows?page=1&limit=10&difficulty=intermediate&sort=-views&fields=instruction,topic,difficulty,views",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "workflows"
+              ],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "10"
+                },
+                {
+                  "key": "difficulty",
+                  "value": "intermediate"
+                },
+                {
+                  "key": "sort",
+                  "value": "-views"
+                },
+                {
+                  "key": "fields",
+                  "value": "instruction,topic,difficulty,views"
+                },
+                {
+                  "key": "search",
+                  "value": "docker",
+                  "disabled": true
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Random Workflow",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/workflows/random",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "workflows",
+                "random"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Latest Workflows",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/workflows/latest?limit=5",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "workflows",
+                "latest"
+              ],
+              "query": [
+                {
+                  "key": "limit",
+                  "value": "5"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Trending Workflows",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/workflows/trending?limit=5",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "workflows",
+                "trending"
+              ],
+              "query": [
+                {
+                  "key": "limit",
+                  "value": "5"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Recommended Workflows",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/workflows/recommended?limit=5",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "workflows",
+                "recommended"
+              ],
+              "query": [
+                {
+                  "key": "limit",
+                  "value": "5"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Popular Workflows",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/workflows/popular?limit=5",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "workflows",
+                "popular"
+              ],
+              "query": [
+                {
+                  "key": "limit",
+                  "value": "5"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Workflow By ID",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/workflows/{{workflow_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "workflows",
+                "{{workflow_id}}"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Create Workflow",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"instruction\": \"Deploy production node container to AWS EKS pod\",\n  \"output\": \"kubectl apply -f eks-deployment.yml\\nkubectl rollout status deployment/node-app\",\n  \"topic\": \"kubernetes\",\n  \"difficulty\": \"advanced\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/workflows",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "workflows"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Replace Workflow (PUT)",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"instruction\": \"Deploy production node container to AWS EKS pod - Updated\",\n  \"output\": \"kubectl apply -f eks-deployment.yml --record\",\n  \"topic\": \"kubernetes\",\n  \"difficulty\": \"expert\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/workflows/{{workflow_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "workflows",
+                "{{workflow_id}}"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Patch Workflow Content",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"difficulty\": \"expert\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/workflows/{{workflow_id}}/content",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "workflows",
+                "{{workflow_id}}",
+                "content"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Archive Workflow",
+          "request": {
+            "method": "PATCH",
+            "url": {
+              "raw": "{{base_url}}/workflows/{{workflow_id}}/archive",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "workflows",
+                "{{workflow_id}}",
+                "archive"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Restore Workflow",
+          "request": {
+            "method": "PATCH",
+            "url": {
+              "raw": "{{base_url}}/workflows/{{workflow_id}}/restore",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "workflows",
+                "{{workflow_id}}",
+                "restore"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Workflow Version Logs",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/workflows/{{workflow_id}}/versions",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "workflows",
+                "{{workflow_id}}",
+                "versions"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Clone Workflow",
+          "request": {
+            "method": "POST",
+            "url": {
+              "raw": "{{base_url}}/workflows/{{workflow_id}}/clone",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "workflows",
+                "{{workflow_id}}",
+                "clone"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Trigger Workflow Run",
+          "request": {
+            "method": "POST",
+            "url": {
+              "raw": "{{base_url}}/workflows/{{workflow_id}}/run",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "workflows",
+                "{{workflow_id}}",
+                "run"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Latest Run Logs",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/workflows/{{workflow_id}}/logs",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "workflows",
+                "{{workflow_id}}",
+                "logs"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Latest Run Metrics",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/workflows/{{workflow_id}}/metrics",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "workflows",
+                "{{workflow_id}}",
+                "metrics"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Workflow Runs History",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/workflows/history/{{workflow_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "workflows",
+                "history",
+                "{{workflow_id}}"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Cancel Running Workflow",
+          "request": {
+            "method": "POST",
+            "url": {
+              "raw": "{{base_url}}/workflows/{{workflow_id}}/cancel",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "workflows",
+                "{{workflow_id}}",
+                "cancel"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Delete Workflow (Permanent)",
+          "request": {
+            "method": "DELETE",
+            "url": {
+              "raw": "{{base_url}}/workflows/{{workflow_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "workflows",
+                "{{workflow_id}}"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "3. Kubernetes & Infrastructure",
+      "description": "Retrieve categorized guides filtered by technology or keywords, supporting full query logic.",
+      "item": [
+        {
+          "name": "Kubernetes Guides",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/infra/k8s?page=1&limit=5",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "infra",
+                "k8s"
+              ],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "5"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Docker Guides",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/infra/docker?page=1&limit=5",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "infra",
+                "docker"
+              ],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "5"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Helm Guides",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/infra/helm?page=1&limit=5",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "infra",
+                "helm"
+              ],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "5"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Terraform Guides",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/infra/terraform?page=1&limit=5",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "infra",
+                "terraform"
+              ],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "5"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "AWS Guides",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/infra/aws?page=1&limit=5",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "infra",
+                "aws"
+              ],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "5"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "GCP Guides",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/infra/gcp?page=1&limit=5",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "infra",
+                "gcp"
+              ],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "5"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Azure Guides",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/infra/azure?page=1&limit=5",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "infra",
+                "azure"
+              ],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "5"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "K8s Pod Guides",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/infra/pods?page=1&limit=5",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "infra",
+                "pods"
+              ],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "5"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "K8s Service Guides",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/infra/services?page=1&limit=5",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "infra",
+                "services"
+              ],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "5"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "K8s Deployment Guides",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/infra/deployments?page=1&limit=5",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "infra",
+                "deployments"
+              ],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "5"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "K8s Ingress Guides",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/infra/ingress?page=1&limit=5",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "infra",
+                "ingress"
+              ],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "5"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "K8s ConfigMap Guides",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/infra/configmaps?page=1&limit=5",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "infra",
+                "configmaps"
+              ],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "5"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "K8s Secret Guides",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/infra/secrets?page=1&limit=5",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "infra",
+                "secrets"
+              ],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "5"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "K8s Volume Guides",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/infra/volumes?page=1&limit=5",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "infra",
+                "volumes"
+              ],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "5"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Networking Guides",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/infra/networking?page=1&limit=5",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "infra",
+                "networking"
+              ],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "5"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Autoscaling Guides",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/infra/autoscaling?page=1&limit=5",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "infra",
+                "autoscaling"
+              ],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "5"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Security Guides",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/infra/security?page=1&limit=5",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "infra",
+                "security"
+              ],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "5"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Monitoring Guides",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/infra/monitoring?page=1&limit=5",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "infra",
+                "monitoring"
+              ],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "5"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Logging Guides",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/infra/logging?page=1&limit=5",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "infra",
+                "logging"
+              ],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "5"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Templates Guides",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/infra/templates?page=1&limit=5",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "infra",
+                "templates"
+              ],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "5"
+                }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "4. Admin User Administration",
+      "description": "Perform CRUD administration operations on users. Protected (Admin Role Required).",
+      "item": [
+        {
+          "name": "List Users",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/users?page=1&limit=10",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "users"
+              ],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "10"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Create User",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Jane Admin\",\n  \"email\": \"jane.admin@cicd-epic.com\",\n  \"password\": \"password123\",\n  \"role\": \"admin\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/users",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "users"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get User By ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/users/{{user_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "users",
+                "{{user_id}}"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Update User Details",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Jane Admin Promoted\",\n  \"role\": \"admin\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/users/{{user_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "users",
+                "{{user_id}}"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Delete User Account",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/users/{{user_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "users",
+                "{{user_id}}"
+              ]
+            }
+          }
+        }
+      ]
+    }
+  ]
+}
